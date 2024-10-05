@@ -35,7 +35,7 @@ resource "aws_security_group" "web_sg" {
 
 # Lanzar la primera instancia EC2 en la primera subnet pública
 resource "aws_instance" "web1" {
-  ami           = "ami-09da212cf18033880"  # Cambia según tu región
+  ami           = var.ami_confg   # Cambia según tu región
   instance_type = "t2.micro"
 
   key_name = "cloud2"
@@ -46,6 +46,8 @@ resource "aws_instance" "web1" {
   # Asociar al grupo de seguridad creado
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
+  user_data = var.docker_install_script
+  
   tags = {
     Name = "WebServer1"
   }
@@ -63,6 +65,8 @@ resource "aws_instance" "web2" {
   # Asociar al grupo de seguridad creado
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
+  user_data = var.docker_install_script
+        
   tags = {
     Name = "WebServer2"
   }
