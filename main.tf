@@ -111,3 +111,65 @@ resource "aws_route_table_association" "private_assoc_2" {
   subnet_id      = aws_subnet.private_subnet_2.id
   route_table_id = aws_route_table.private_route_table.id
 }
+
+# ----------- EC2 Instances --------------
+
+# Crear una instancia EC2 en la Subnet Pública 1
+resource "aws_instance" "ec2_instance_1" {
+  ami           = "ami-0c55b159cbfafe1f0"  # Amazon Linux 2 AMI (puedes cambiarla según tu caso)
+  instance_type = "t2.micro"  # Tipo de instancia, puede ser cambiado
+  subnet_id     = aws_subnet.public_subnet_1.id  # Subnet pública 1
+  associate_public_ip_address = true  # Asegura que la instancia tenga una IP pública
+  key_name      = "my_key_pair"  # Asegúrate de tener un key_pair creado
+
+  tags = {
+    Name = "EC2_Public_Subnet_1"
+  }
+}
+
+# Crear una instancia EC2 en la Subnet Pública 2
+resource "aws_instance" "ec2_instance_2" {
+  ami           = "ami-0c55b159cbfafe1f0"  # Amazon Linux 2 AMI (puedes cambiarla según tu caso)
+  instance_type = "t2.micro"  # Tipo de instancia, puede ser cambiado
+  subnet_id     = aws_subnet.public_subnet_2.id  # Subnet pública 2
+  associate_public_ip_address = true  # Asegura que la instancia tenga una IP pública
+  key_name      = "my_key_pair"  # Asegúrate de tener un key_pair creado
+
+  tags = {
+    Name = "EC2_Public_Subnet_2"
+  }
+}
+
+# Security Group para permitir acceso SSH (puedes ajustar esto según tus necesidades)
+resource "aws_security_group" "allow_ssh" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "allow_ssh"
+  }
+}
+
+# Asociar el security group a las instancias EC2
+resource "aws_network_interface_sg_attachment" "sg_attachment_1" {
+  security_group_id    = aws_security_group.allow_ssh.id
+  network_interface_id = aws_instance.ec2_instance_1.primary_network_interface_id
+}
+
+resource "aws_network_interface_sg_attachment" "sg_attachment_2" {
+  security_group_id    = aws_security_group.allow_ssh.id
+  network_interface_id = aws_instance.ec2_instance_2.primary_network_interface_id
+}
