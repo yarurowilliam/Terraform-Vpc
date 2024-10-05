@@ -37,6 +37,81 @@ resource "aws_subnet" "public_subnet_2" {
   }
 }
 
+# Crear 2 Subnets Privadas en diferentes zonas
+resource "aws_subnet" "private_subnet_1" {
+  vpc_id            = aws_vpc.my_vpc.id
+  cidr_block        = "30.0.3.0/24"
+  availability_zone = "us-east-2c"  # Zona 3
+
+  tags = {
+    Name = "private_subnet_1"
+  }
+}
+
+resource "aws_subnet" "private_subnet_2" {
+  vpc_id            = aws_vpc.my_vpc.id
+  cidr_block        = "30.0.4.0/24"
+  availability_zone = "us-east-2a"  # Zona 1
+
+  tags = {
+    Name = "private_subnet_2"
+  }
+}
+
+# Crear una Gateway de Internet para las subnets públicas
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  tags = {
+    Name = "my_internet_gateway"
+  }
+}
+
+# Crear una tabla de rutas para las subnets públicas
+resource "aws_route_table" "public_route_table" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+
+  tags = {
+    Name = "public_route_table"
+  }
+}
+
+# Asociar subnets públicas a la tabla de rutas pública
+resource "aws_route_table_association" "public_assoc_1" {
+  subnet_id      = aws_subnet.public_subnet_1.id
+  route_table_id = aws_route_table.public_route_table.id
+}
+
+resource "aws_route_table_association" "public_assoc_2" {
+  subnet_id      = aws_subnet.public_subnet_2.id
+  route_table_id = aws_route_table.public_route_table.id
+}
+
+# Crear tabla de rutas para las subnets privadas (sin acceso a Internet)
+resource "aws_route_table" "private_route_table" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  tags = {
+    Name = "private_route_table"
+  }
+}
+
+# Asociar subnets privadas a la tabla de rutas privada
+resource "aws_route_table_association" "private_assoc_1" {
+  subnet_id      = aws_subnet.private_subnet_1.id
+  route_table_id = aws_route_table.private_route_table.id
+}
+
+resource "aws_route_table_association" "private_assoc_2" {
+  subnet_id      = aws_subnet.private_subnet_2.id
+  route_table_id = aws_route_table.private_route_table.id
+}
+
 # ----------- EC2 Instances --------------
 
 # Crear una instancia EC2 en la Subnet Pública 1
@@ -65,26 +140,26 @@ resource "aws_instance" "ec2_instance_2" {
   }
 }
 
-# Security Group para permitir acceso SSH (puerto 22) y HTTP (puerto 80)
+# Security Group para permitir acceso SSH y HTTP (puedes ajustar esto según tus necesidades)
 resource "aws_security_group" "allow_ssh_http" {
   vpc_id = aws_vpc.my_vpc.id
 
-  # Reglas de ingreso (inbound) para el puerto 22 (SSH) y el puerto 80 (HTTP)
+  # Reglas de entrada (ingress) para SSH y HTTP
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Acceso SSH desde cualquier lugar
+    cidr_blocks = ["0.0.0.0/0"]  # Permitir acceso SSH desde cualquier dirección IP
   }
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Acceso HTTP desde cualquier lugar
+    cidr_blocks = ["0.0.0.0/0"]  # Permitir acceso HTTP desde cualquier dirección IP
   }
 
-  # Reglas de egreso (outbound) para permitir cualquier tráfico saliente
+  # Reglas de salida (egress) para permitir todo el tráfico saliente
   egress {
     from_port   = 0
     to_port     = 0
