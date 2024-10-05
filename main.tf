@@ -1,6 +1,6 @@
 # Provider de AWS
 provider "aws" {
-  region = "us-east-2"  # Cambiado a us-east-2 (Ohio)
+  region = "us-east-2"  # Usamos la región us-east-2
 }
 
 # Crear VPC con rango 30.0.0.0/16
@@ -14,12 +14,12 @@ resource "aws_vpc" "my_vpc" {
   }
 }
 
-# Crear 2 Subnets Públicas
+# Crear 2 Subnets Públicas en diferentes zonas
 resource "aws_subnet" "public_subnet_1" {
   vpc_id            = aws_vpc.my_vpc.id
   cidr_block        = "30.0.1.0/24"
   map_public_ip_on_launch = true
-  availability_zone = "us-east-2a"  # Cambiada a us-east-2a
+  availability_zone = "us-east-2a"  # Zona 1
 
   tags = {
     Name = "public_subnet_1"
@@ -30,18 +30,18 @@ resource "aws_subnet" "public_subnet_2" {
   vpc_id            = aws_vpc.my_vpc.id
   cidr_block        = "30.0.2.0/24"
   map_public_ip_on_launch = true
-  availability_zone = "us-east-2b"  # Cambiada a us-east-2b
+  availability_zone = "us-east-2b"  # Zona 2
 
   tags = {
     Name = "public_subnet_2"
   }
 }
 
-# Crear 2 Subnets Privadas
+# Crear 2 Subnets Privadas en diferentes zonas
 resource "aws_subnet" "private_subnet_1" {
   vpc_id            = aws_vpc.my_vpc.id
   cidr_block        = "30.0.3.0/24"
-  availability_zone = "us-east-2a"  # Cambiada a us-east-2a
+  availability_zone = "us-east-2c"  # Zona 3
 
   tags = {
     Name = "private_subnet_1"
@@ -51,7 +51,7 @@ resource "aws_subnet" "private_subnet_1" {
 resource "aws_subnet" "private_subnet_2" {
   vpc_id            = aws_vpc.my_vpc.id
   cidr_block        = "30.0.4.0/24"
-  availability_zone = "us-east-2b"  # Cambiada a us-east-2b
+  availability_zone = "us-east-2a"  # Zona 1
 
   tags = {
     Name = "private_subnet_2"
