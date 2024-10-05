@@ -7,3 +7,8 @@ variable "vpc_cidr" {
   description = "El CIDR block para la VPC"
   default     = "30.0.0.0/16"
 }
+
+variable "ami_confg" {
+  description = "Configuración de la AMI"
+  default     = "ami-09da212cf18033880"
+}
