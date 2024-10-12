@@ -1,0 +1,60 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "CRUD API",
+    "description": "API para operaciones CRUD con Lambda y DynamoDB",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/crud": {
+      "post": {
+        "x-amazon-apigateway-integration": {
+          "type": "aws_proxy",
+          "httpMethod": "POST",
+          "uri": "${create_item_arn}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      },
+      "get": {
+        "x-amazon-apigateway-integration": {
+          "type": "aws_proxy",
+          "httpMethod": "GET",
+          "uri": "${read_item_arn}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      },
+      "put": {
+        "x-amazon-apigateway-integration": {
+          "type": "aws_proxy",
+          "httpMethod": "PUT",
+          "uri": "${update_item_arn}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      },
+      "delete": {
+        "x-amazon-apigateway-integration": {
+          "type": "aws_proxy",
+          "httpMethod": "DELETE",
+          "uri": "${delete_item_arn}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -25,7 +25,7 @@ resource "aws_security_group" "web_sg" {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"]  # Ajusta este CIDR al rango de tu VPC
+    cidr_blocks = ["0.0.0.0/0"]  # Ajusta este CIDR al rango de tu VPC
   }
 
   # Permitir todo el tráfico saliente (opcional, ya que estamos permitiendo 3306 explícitamente)
